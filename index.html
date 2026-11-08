@@ -114,7 +114,6 @@
     <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
         <button id="musicToggle" class="bg-maroon text-gold w-14 h-14 rounded-full shadow-2xl flex items-center justify-center border-2 border-gold hover:scale-110 transition-transform duration-300 relative group" title="మంగళ సంగీతాన్ని ఆన్ లేదా ఆఫ్ చేయండి" aria-label="మంగళ సంగీతాన్ని ఆన్ లేదా ఆఫ్ చేయండి">
             <i id="musicIcon" class="fa-solid fa-music text-xl"></i>
-            <span class="absolute right-16 bg-maroon-dark text-gold-light text-xs px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-gold/30 pointer-events-none">మంగళ సంగీతం</span>
         </button>
     </div>
 
@@ -273,7 +272,7 @@
                     </h3>
                     <div class="space-y-4 text-sm text-gray-700">
                         <div>
-                            <p class="text-base md:text-lg font-bold text-maroon">శ్రీ బొంగు నారాయణరావు మరియు శ్రీమతి శ్రీదేవి</p>
+                            <p class="text-base md:text-lg font-bold text-maroon">శ్రీ బొంగు నారాయణరావు మరియు శ్రీమతి లక్ష్మి</p>
                             <p class="text-xs text-gray-600">వరుడి తల్లిదండ్రులు</p>
                         </div>
                     </div>
@@ -387,6 +386,23 @@
             musicIcon.className = 'fa-solid fa-music text-xl';
         });
         bgMusic.play().catch(() => {});
+
+        const autoStartEvents = ['pointerdown', 'touchstart', 'keydown', 'wheel'];
+        const removeAutoStartListeners = () => {
+            autoStartEvents.forEach(eventName => {
+                document.removeEventListener(eventName, startMusicOnFirstInteraction);
+            });
+            window.removeEventListener('scroll', startMusicOnFirstInteraction);
+        };
+        const startMusicOnFirstInteraction = (event) => {
+            if (event.target instanceof Element && event.target.closest('#musicToggle')) return;
+            bgMusic.play().catch(() => {});
+        };
+        bgMusic.addEventListener('play', removeAutoStartListeners, { once: true });
+        autoStartEvents.forEach(eventName => {
+            document.addEventListener(eventName, startMusicOnFirstInteraction, { passive: true });
+        });
+        window.addEventListener('scroll', startMusicOnFirstInteraction, { passive: true });
 
         musicToggleBtn.addEventListener('click', async () => {
             if (bgMusic.paused) {
